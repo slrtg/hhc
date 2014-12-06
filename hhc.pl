@@ -54,7 +54,7 @@ chdir ("$unzipped_diag") or die "$!";
 
 
 
-#Unzip the relevant file
+#Unzip the relevant file and do stuff
 
 my $diag_folder = new IO::Uncompress::Unzip $zipped_diag or die "Cannot open $zipped_diag: $UnzipError";
 die "Zipfile has no members" if ! defined $diag_folder->getHeaderInfo;
@@ -63,4 +63,3 @@ for (my $status = 1; $status > 0; $status = $diag_folder->nextStream){
 	warn "Processing member $name\n";
 	unzip $zipped_diag => $name, Name => $name or die "unzip failed: $UnzipError\n";
 }
-
