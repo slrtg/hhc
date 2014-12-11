@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use IO::File;
 use Cwd;
-use IO::Uncompress::Unzip qw($UnzipError);
+use IO::Uncompress::Unzip qw(unzip $UnzipError);
 use File::Copy qw(copy);
 use File::Path qw(mkpath);
 use File::Spec::Functions qw(splitpath);
@@ -31,11 +31,6 @@ sub find_diags{
 
     }
 }    
-
-
-
-
-
 
 
 
@@ -77,7 +72,7 @@ sub choose_diag{
 sub unzip_diag{
     #Unzip the new diagnostic into its own folder
     my $unzipped_diag = "$1" if ($zipped_diag =~/(^Diagnostics.*)(\.zip)/);
-    unzip($zipped_diag,$unzipped_diag);
+    modded_unzip($zipped_diag,$unzipped_diag);
 
     #Open and read unzipped diagnostic to identify SMUDiagnostics.zip
     opendir my $smu_dh, "$unzipped_diag" or die "$!";
@@ -86,7 +81,15 @@ sub unzip_diag{
     }
     my $uz_smu_diag = "$1" if ($z_smu_diag =~/(SMU.*)\.zip/);
     chdir $unzipped_diag;
-    unzip($z_smu_diag, $uz_smu_diag);
+    #Extracts only the smuinfo.txt file
+    $uz_smu_diag = new IO::Uncompress::Unzip $z_smu_diag or die "$UnzipError";
+    for (my $status = 1; $status > 0; $status = $uz_smu_diag->nextStream){
+        my $name = $uz_smu_diag->getHeaderInfo->{Name};
+        if ($name =~/smuinfo.txt/i){
+            unzip $z_smu_diag => $name, Name => $name or die "$UnzipError";
+            last;
+        }
+    }
     
 }
 
@@ -96,7 +99,7 @@ sub unzip_diag{
 
 
 #A rewritten unzip function found on github used in the unzip diag sub
-sub unzip {
+sub modded_unzip {
     my ($file, $dest) = @_;
  
     die 'Need a file argument' unless defined $file;
