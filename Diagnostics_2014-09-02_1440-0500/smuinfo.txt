@@ -1,4 +1,5 @@
 System Management Unit (SMU) Version: 11.2.3319.04 Thu Oct 31, 2013 10:33:39 PDT
+External SMU (not VMware)
 SMU300
 Now: Tue Sep  2 14:34:52 CDT 2014
 

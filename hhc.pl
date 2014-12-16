@@ -15,6 +15,7 @@ my @diagfsr;
 find_diags();
 choose_diag();
 unzip_diag();
+parse_smuinfo();
 
 
 
@@ -91,6 +92,20 @@ sub unzip_diag{
         }
     }
     
+}
+
+sub parse_smuinfo{
+  my $smu_version;
+  my $smu_hardware;
+  open my $smuinfotxt, "smuinfo.txt" or die "Couldn't open file: $!";
+  while (<$smuinfotxt>){
+    #chomp;
+    #print "$_";
+    $smu_version = $2 if ($_ =~ /(System Management Unit \(SMU\) Version: )(\d+\.\d+\.\d+\.\d+)/);
+    $smu_hardware = $_ if ($_ =~/^Internal SMU$|^Virtual SMU$|^SMU\d{3}$/);
+  }
+  print "SMU Firmware: $smu_version\n";
+  print "SMU Hardware: $smu_hardware\n";
 }
 
 
