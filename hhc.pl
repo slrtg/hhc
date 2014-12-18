@@ -16,6 +16,7 @@ find_diags();
 choose_diag();
 unzip_diag();
 parse_smuinfo();
+modded_unzip("SiDiagnostics.zip", "SiDiagnostics");
 
 
 
@@ -71,7 +72,7 @@ sub choose_diag{
 
 #Unzip Parent diagnositc and child SMU diagnostic
 sub unzip_diag{
-    #Unzip the new diagnostic into its own folder
+    #Unzip the new diagnostic into its own folder, retrieve smuinfo.txt 
     my $unzipped_diag = "$1" if ($zipped_diag =~/(^Diagnostics.*)(\.zip)/);
     modded_unzip($zipped_diag,$unzipped_diag);
 
@@ -104,6 +105,7 @@ sub parse_smuinfo{
     $smu_version = $2 if ($_ =~ /(System Management Unit \(SMU\) Version: )(\d+\.\d+\.\d+\.\d+)/);
     $smu_hardware = $_ if ($_ =~/^Internal SMU$|^Virtual SMU$|^SMU\d{3}$/);
   }
+  print "SMU Analysis:\n";
   print "SMU Firmware: $smu_version\n";
   print "SMU Hardware: $smu_hardware\n";
 }

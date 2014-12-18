@@ -8,6 +8,8 @@ use File::Copy qw(copy);
 use File::Path qw(mkpath);
 use File::Spec::Functions qw(splitpath);
 
+parse_smuinfo();
+
 sub parse_smuinfo{
 	my $smu_version;
 	my $smu_hardware;
@@ -21,5 +23,3 @@ sub parse_smuinfo{
 	print "SMU Firmware: $smu_version\n";
 	print "SMU Hardware: $smu_hardware\n";
 }
-
-parse_smuinfo();
