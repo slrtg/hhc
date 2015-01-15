@@ -234,6 +234,8 @@ sub parse_sid{
   my $fcls1;
   my $fcls2;
 
+  print "\nHNAS NODE INFO\n";
+
   #Server Uptime
   if ($sid =~/<status for pnode 1>.*?Server uptime:(.*?)\n/s){
     $node1uptime = $1;
@@ -261,4 +263,173 @@ sub parse_sid{
     $fcls2 = $1;
     print "Node 2 FC Link Status:\n$fcls2\n";
   }
+
+  #NETWORK INFO
+
+  print "\nNETWORK INFO\n";
+
+  #Historical TCP Statistics
+  my $rxstats1;
+  my $rxstats2;
+  my $totalpackets1;
+  my $totalpackets2;
+  my $goodpackets1;
+  my $goodpackets2;
+
+  if ($sid =~/<tcpstats for pnode 1>.*?Total Packets: (.*?)\n/s){
+    $totalpackets1 = $1;
+  }
+  if ($sid =~/<tcpstats for pnode 2>.*?Total Packets: (.*?)\n/s){
+    $totalpackets2 = $1;
+  }
+  if ($sid =~/<tcpstats for pnode 1>.*?Good Packets: (.*?)\n/s){
+    $goodpackets1 = $1;
+  }
+  if ($sid =~/<tcpstats for pnode 2>.*?Good Packets: (.*?)\n/s){
+    $goodpackets2 = $1;
+  }
+
+  #Node 1
+
+  if ($totalpackets1/$goodpackets1 < 1.000){
+    $rxstats1 = "OK";
+  } elsif ($totalpackets1/$goodpackets1 > 2.000){
+    $rxstats1 = "Critical";
+  } else {
+    $rxstats1 = "Needs Attention";
+  }
+  print "Node 1 RX Stats: Dropped Packets: $rxstats1\n";
+
+  #Node 2
+
+  if ($totalpackets2/$goodpackets2 < 1.000){
+    $rxstats2 = "OK";
+  } elsif ($totalpackets2/$goodpackets2 > 2.000){
+    $rxstats2 = "Critical";
+  } else {
+    $rxstats2 = "Needs Attention";
+  }
+  print "Node 2 RX Stats: Dropped Packets: $rxstats2\n";
+
+  #Ethernet Settings
+  my $ssca1;
+  my $ssca2;
+  my $ssidle1;
+  my $ssidle2;
+  my $tcpws1;
+  my $tcpws2;
+  my $ess1;
+  my $ess2;
+
+  if ($sid =~/<ipeng.*?pnode 1>.*?ca:.*?(\w{2,3}).*?\w*?.*?\n/s){
+    $ssca1 = $1;
+  }
+  if ($sid =~/<ipeng.*?pnode 2>.*?ca:.*?(\w{2,3}).*?\w*?.*?\n/s){
+    $ssca2 = $1;
+  }
+  if ($sid =~/<ipeng.*?pnode 1>.*?idle:.*?(\w{2,3}).*?\w*?.*?\n/s){
+    $ssidle1 = $1;
+  }
+  if ($sid =~/<ipeng.*?pnode 2>.*?idle:.*?(\w{2,3}).*?\w*?.*?\n/s){
+    $ssidle2 = $1;
+  }
+  if ($sid =~/<ipeng.*?pnode 1>.*?TCP Window Scaling enabled:.*?(\w{2,3}).*?\w*?.*?\n/s){
+    $tcpws1 = $1;
+  }
+  if ($sid =~/<ipeng.*?pnode 2>.*?TCP Window Scaling enabled:.*?(\w{2,3}).*?\w*?.*?\n/s){
+    $tcpws2 = $1;
+  }
+
+  if ($ssca1 =~ "Yes" && $ssidle1 =~ "Yes" && $tcpws1 =~ "Yes"){
+    $ess1 = "Ok";
+  } else {
+    $ess1 = "Needs Attention";
+  }
+  print "Node 1 Ethernet Settings Status: $ess1\n";
+
+  if ($ssca2 =~ "Yes" && $ssidle2 =~ "Yes" && $tcpws2 =~ "Yes"){
+    $ess2 = "Ok";
+  } else {
+    $ess2 = "Needs Attention";
+  }
+  print "Node 2 Ethernet Settings Status: $ess2\n";
+
+  #HNAS SD, SP, AND FS HEALTH
+  print "\nHNAS SYSTEM DRIVE, STORAGE POOL AND FILE SYSTEM HEALTH\n";
+
+  #SD Health Check
+  my $sdsf1;
+  my $sdsf2;
+  
+  if ($sid =~/<sd-list --superflush.*?pnode 1>.*?-\n(.*?)<s/s){
+    $sdsf1 = $1;
+    print "Node 1 System Drive Health Check:\n$sdsf1\n";
+  }
+  if ($sid =~/<sd-list --superflush.*?pnode 2>.*?-\n(.*?)<s/s){
+    $sdsf2 = $1;
+    print "Node 2 System Drive Health Check:\n$sdsf2\n";
+  }
+
+  #Scsi Queue Depth
+  my $sqd1;
+  my $sqd2;
+
+  if ($sid =~/<scsi-queue-depths for pnode 1>.*?\n(.*?)<s/s){
+    $sqd1 = $1;
+    print "Node 1 Scsi Queue Depth:\n$sqd1\n";
+  }
+  if ($sid =~/<scsi-queue-depths for pnode 2>.*?\n(.*?)<s/s){
+    $sqd2 = $1;
+    print "Node 2 Scsi Queue Depth:\n$sqd2\n";
+  }
+
+  #Span-List -FSV
+  my $spfsv1;
+  my $spfsv2;
+  
+  if ($sid =~/<span-list -fsv for pnode 1>\n(.*?)<span-list -fsv for pnode 2>\n/s){
+    $spfsv1 = $1;
+    print "Node 1 Span-List -FSV:\n$spfsv1\n";
+  }
+  if ($sid =~/<span-list -fsv for pnode 2>\n(.*?)<sd-dump-unloadable/s){
+    $spfsv2 = $1;
+    print "Node 2 Span-List -FSV:\n$spfsv2\n";
+  }
+
+  #Storage Back-End Backlog
+  my $mqr1 = 0;
+  my $mqr2 = 0;
+  my $mqw1 = 0;
+  my $mqw2 = 0;
+
+  #Reads for node 1
+  if ($sid =~/<devinfo -a for pnode 1>.*?-\n(.*?)<d/s){
+    for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?(\d+) *?\d+ *? \d+.*?\n/g){
+      $mqr1 = $_ if $mqr1 < $_;
+    }
+  }
+  #Writes for node 1
+  if ($sid =~/<devinfo -a for pnode 1>.*?-\n(.*?)<d/s){
+    for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *? (\d+).*?\n/g){
+      $mqw1 = $_ if $mqw1 < $_;
+    }
+  }
+  print "Node 1 Highest Number of Queued Reads:  $mqr1\n";
+  print "Node 1 Highest Number of Queued Writes: $mqw1\n";
+
+  #Reads for node 2
+  if ($sid =~/<devinfo -a for pnode 2>.*?-\n(.*?)\n<scsi/s){
+    for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?(\d+) *?\d+ *? \d+.*?\n/g){
+      $mqr2 = $_ if $mqr2 < $_;
+    }
+  }
+  #Writes for node 2
+  if ($sid =~/<devinfo -a for pnode 2>.*?-\n(.*?)\n<scsi/s){
+    for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *? (\d+).*?\n/g){
+      $mqw2 = $_ if $mqw2 < $_;
+    }
+  }
+  print "Node 2 Highest Number of Queued Reads:  $mqr2\n";
+  print "Node 2 Highest Number of Queued Writes: $mqw2\n";
+
 }

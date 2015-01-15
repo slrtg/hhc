@@ -11594,7 +11594,7 @@ TCP statistics for port ag1
                 Last Reset: 2014-07-12 12:29:04-05:00
 RX Stats: 
          Total Packets: 24582501454174872
-          Good Packets: 24582501451722715
+          Good Packets: 24582501451722
                Dropped: 2452157
                  Bytes: 1163489348748175653
                  Runts: 0
@@ -13571,7 +13571,7 @@ Parameter                                   Value      Default
 -----------------------------------------   ---------- ----------
 Def wnd (bytes):                            64240      64240
 Delayed acks:                               Yes        Yes
-Slow start ca:                              Yes        Yes
+Slow start ca:                              Yes        Hi
 SS restart double mss:                      Yes        Yes
 Nagle:                                      No         No
 Silly window avoid:                         Yes        Yes
@@ -40624,7 +40624,7 @@ Invalid SI number: 1
  Number,  Current / Max                    Normal   High-Priority    to
  En/Dis   R   W All        Cur /  Max    Cur /  Max    Cur /  Max  Queue
 -------------------------------------------------------------------------
-   0 E    0   0   0  32      0    626      0   7606      0     12     0
+   0 E    0   0   0  32      7    626      0   7606      0     12     0
    1 E    0   0   0  32      0    573      0   7818      0      2     0
    2 E    0   0   0  32      0    572      0   6135      0      3     0
    3 E    0   0   0  32      0    472      0   7865      0      3     0
