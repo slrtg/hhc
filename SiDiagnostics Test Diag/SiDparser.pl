@@ -357,19 +357,69 @@ sub parse_sid{
   #HNAS SD, SP, AND FS HEALTH
   print "\nHNAS SYSTEM DRIVE, STORAGE POOL AND FILE SYSTEM HEALTH\n";
 
-  #SD Health Check
-  my $sdsf1;
-  my $sdsf2;
+    #SYSTEM DRIVES
+  #SD Status  
+  my $sdstatus1 = "OK";
+  my $sdstatus2 = "OK";
   
   if ($sid =~/<sd-list --superflush.*?pnode 1>.*?-\n(.*?)<s/s){
-    $sdsf1 = $1;
-    print "Node 1 System Drive Health Check:\n$sdsf1\n";
-  }
-  if ($sid =~/<sd-list --superflush.*?pnode 2>.*?-\n(.*?)<s/s){
-    $sdsf2 = $1;
-    print "Node 2 System Drive Health Check:\n$sdsf2\n";
+    for ($1 =~m/.*?\d+ *?(\w+).*?\n/g){
+      $sdstatus1 = $_ if $sdstatus1 gt "$_";
+    }
+    $sdstatus1 = "Need Attention" if $sdstatus1 ne "OK";
+    print "Node 1 SD Status: $sdstatus1\n";
   }
 
+  if ($sid =~/<sd-list --superflush.*?pnode 2>.*?-\n(.*?)<s/s){
+    for ($1 =~m/.*?\d+ *?(\w+).*?\n/g){
+      $sdstatus2 = $_ if $sdstatus2 gt "$_";
+    }
+    $sdstatus2 = "Need Attention" if $sdstatus2 ne "OK";
+    print "Node 2 SD Status: $sdstatus2\n";
+  }
+  #SD Allowed Status
+  my $sdallow1 = "Yes";
+  my $sdallow2 = "Yes";
+  if ($sid =~/<sd-list --superflush.*?pnode 1>.*?-\n(.*?)<s/s){
+    for ($1 =~m/.*?\d+ *?\w+ *?(\w+).*?\n/g){
+      $sdallow1 = $_ if $sdallow1 gt "$_";
+    }
+    $sdallow1 = "Need Attention" if $sdallow1 ne "Yes";
+    $sdallow1 = "OK" if $sdallow1 eq "Yes";
+    print "Node 1 SD Allowed Status: $sdallow1\n";
+  }
+  if ($sid =~/<sd-list --superflush.*?pnode 2>.*?-\n(.*?)<s/s){
+    for ($1 =~m/.*?\d+ *?\w+ *?(\w+).*?\n/g){
+      $sdallow2 = $_ if $sdallow2 gt "$_";
+    }
+    $sdallow2 = "Need Attention" if $sdallow2 ne "Yes";
+    $sdallow2 = "OK" if $sdallow2 eq "Yes";
+    print "Node 2 SD Allowed Status: $sdallow2\n";
+  }
+  #SD Superflush Settings Check
+  my $sfstatus1 = "OK";
+  my $sfstatus2 = "OK";
+  if ($sid =~/<sd-list --superflush.*?pnode 1>.*?-\n.*?\w\w-\d\d +?(\d.*?K)\n/s){
+    my $superflush1 = $1;
+    if ($sid =~/<sd-list --superflush.*?pnode 1>.*?-\n(.*?)<s/s){
+      for ($1 =~m/.*?\d+ *?\w+.*?\w\w-\d\d *?(\d.*?K)\n/g){
+        $sfstatus1 = "Needs Attention" if $_ ne $superflush1;
+      }
+    }
+  }
+  print "Node 1 Superflush Setting: $sfstatus1\n";
+
+  if ($sid =~/<sd-list --superflush.*?pnode 2>.*?-\n.*?\w\w-\d\d +?(\d.*?K)\n/s){
+    my $superflush2 = $1;
+    if ($sid =~/<sd-list --superflush.*?pnode 2>.*?-\n(.*?)<s/s){
+      for ($1 =~m/.*?\d+ *?\w+.*?\w\w-\d\d *?(\d.*?K)\n/g){
+        $sfstatus2 = "Needs Attention" if $_ ne $superflush2;
+      }
+    }
+  }
+  print "Node 2 Superflush Setting: $sfstatus2\n"; 
+  
+  #REPLACE WITH VALUE CAPTURING SCRIPT
   #Scsi Queue Depth
   my $sqd1;
   my $sqd2;
@@ -383,6 +433,7 @@ sub parse_sid{
     print "Node 2 Scsi Queue Depth:\n$sqd2\n";
   }
 
+  #REPLACE WITH VALUE CAPTURING SCRIPT
   #Span-List -FSV
   my $spfsv1;
   my $spfsv2;
@@ -431,5 +482,6 @@ sub parse_sid{
   }
   print "Node 2 Highest Number of Queued Reads:  $mqr2\n";
   print "Node 2 Highest Number of Queued Writes: $mqw2\n";
-
 }
+
+

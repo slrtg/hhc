@@ -41493,7 +41493,7 @@ Device  Status  Alw  GiByte  Mirror   In span                       Comment
 Device  Status  Alw  GiByte  Mirror   In span                       S'flush
 ------  ------  ---  ------  -------  ----------------------------  --------
    0    OK      Yes   10854   Pri     SP-01                           3x128K
-   1    OK      Yes   10854   Pri     SP-01                           3x128K
+   1    OK      Yes   10854   Pri     SP-01                           3x138K
    2    OK      Yes   10854   Pri     SP-01                           3x128K
    3    OK      Yes   10854   Pri     SP-01                           3x128K
    4    OK      Yes   10854   Pri     SP-02                           3x128K
@@ -41506,7 +41506,7 @@ Device  Status  Alw  GiByte  Mirror   In span                       S'flush
    0    OK      Yes   10854   Pri     SP-01                           3x128K
    1    OK      Yes   10854   Pri     SP-01                           3x128K
    2    OK      Yes   10854   Pri     SP-01                           3x128K
-   3    OK      Yes   10854   Pri     SP-01                           3x128K
+   3    OK      Yes   10854   Pri     SP-01                           3x124K
    4    OK      Yes   10854   Pri     SP-02                           3x128K
    5    OK      Yes   10854   Pri     SP-02                           3x128K
    6    OK      Yes   10854   Pri     SP-02                           3x128K
