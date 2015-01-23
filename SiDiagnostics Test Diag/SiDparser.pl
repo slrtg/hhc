@@ -239,11 +239,11 @@ sub parse_sid{
   #Server Uptime
   if ($sid =~/<status for pnode 1>.*?Server uptime:(.*?)\n/s){
     $node1uptime = $1;
-    print "Node 1 Server Uptime:   $node1uptime\n";
+    print "Node 1 Server Uptime: $node1uptime\n";
   }
   if ($sid =~/<status for pnode 2>.*?Server uptime:(.*?)\n/s){
     $node2uptime = $1;
-    print "Node 2 Server Uptime:   $node2uptime\n";
+    print "Node 2 Server Uptime: $node2uptime\n";
   }
   #Battery Fitted Date
   if ($sid =~/<ver -h for pnode 1>.*?Battery fitted date:(.*?)\n/s){
@@ -419,19 +419,26 @@ sub parse_sid{
   }
   print "Node 2 Superflush Setting: $sfstatus2\n"; 
   
-  #REPLACE WITH VALUE CAPTURING SCRIPT
   #Scsi Queue Depth
-  my $sqd1;
-  my $sqd2;
+  my $sqdstatus1 = "OK";
+  my $sqd1 = "32";
+  my $sqdstatus2 = "OK";
+  my $sqd2 = "32";
 
-  if ($sid =~/<scsi-queue-depths for pnode 1>.*?\n(.*?)<s/s){
-    $sqd1 = $1;
-    print "Node 1 Scsi Queue Depth:\n$sqd1\n";
+  if ($sid =~/<scsi-queue-depths for pnode 1>.*?-\n(.*?)<s/s){
+    for ($1 =~ m/.*?\d+.*?\d+.*?(\d+).*?\n/sg){
+      $sqdstatus1 = "Needs Attention" if $sqd1 ne $_;
+    }
+    print "Node 1 SCSI Queue Depth: $sqdstatus1\n";
   }
-  if ($sid =~/<scsi-queue-depths for pnode 2>.*?\n(.*?)<s/s){
-    $sqd2 = $1;
-    print "Node 2 Scsi Queue Depth:\n$sqd2\n";
+
+  if ($sid =~/<scsi-queue-depths for pnode 2>.*?-\n(.*?)<s/s){
+    for ($1 =~ m/.*?\d+.*?\d+.*?(\d+).*?\n/sg){
+      $sqdstatus2 = "Needs Attention" if $sqd2 ne $_;
+    }
+    print "Node 2 SCSI Queue Depth: $sqdstatus2\n";
   }
+  
 
   #REPLACE WITH VALUE CAPTURING SCRIPT
   #Span-List -FSV
@@ -458,30 +465,90 @@ sub parse_sid{
     for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?(\d+) *?\d+ *? \d+.*?\n/g){
       $mqr1 = $_ if $mqr1 < $_;
     }
+    print "Node 1 Highest Number of Queued Reads:  $mqr1\n";
   }
   #Writes for node 1
   if ($sid =~/<devinfo -a for pnode 1>.*?-\n(.*?)<d/s){
     for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *? (\d+).*?\n/g){
       $mqw1 = $_ if $mqw1 < $_;
     }
+    print "Node 1 Highest Number of Queued Writes: $mqw1\n";
   }
-  print "Node 1 Highest Number of Queued Reads:  $mqr1\n";
-  print "Node 1 Highest Number of Queued Writes: $mqw1\n";
 
   #Reads for node 2
   if ($sid =~/<devinfo -a for pnode 2>.*?-\n(.*?)\n<scsi/s){
     for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?(\d+) *?\d+ *? \d+.*?\n/g){
       $mqr2 = $_ if $mqr2 < $_;
     }
+    print "Node 2 Highest Number of Queued Reads:  $mqr2\n";
   }
   #Writes for node 2
   if ($sid =~/<devinfo -a for pnode 2>.*?-\n(.*?)\n<scsi/s){
     for ($1 =~ m/ *?\d+ *?\w+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *?\d+ *? (\d+).*?\n/g){
       $mqw2 = $_ if $mqw2 < $_;
     }
+    print "Node 2 Highest Number of Queued Writes: $mqw2\n";
   }
-  print "Node 2 Highest Number of Queued Reads:  $mqr2\n";
-  print "Node 2 Highest Number of Queued Writes: $mqw2\n";
-}
 
+
+    #REPLACE WITH VALUE CAPTURING SCRIPT
+  #Span-List -FSV
+ 
+  
+  #Storage Pool Status
+  my $sps1 = "";
+  my $sps2 = "";
+  my $spyes1 = 0;
+  my $spyes2 = 0;
+  my $spno1 = 0;
+  my $spno2 = 0;
+  if ($sid =~/<span-list -fsv for pnode 1>\n(.*?)<span-list -fsv for pnode 2>\n/s){
+    for ($1 =~m/.*?SP-\d\d.*?(\w+).*?\n/gs){
+      $_ eq "No" ? $spno1++ : $spyes1++
+    } 
+    if ($spno1 == 0){
+      $sps1 = "OK";
+    } elsif ($spyes1 == 0){
+      $sps1 = "Critical";
+    } else {
+      $sps1 = "Need Attention";
+    }
+  print "Node 1 Storage Pool Status: $sps1\n";  
+  }
+
+  if ($sid =~/<span-list -fsv for pnode 2>\n(.*?)<s/s){
+    for ($1 =~m/.*?SP-\d\d.*?(\w+).*?\n/gs){
+      $_ eq "No" ? $spno2++ : $spyes2++
+    } 
+    if ($spno2 == 0){
+      $sps2 = "OK";
+    } elsif ($spyes2 == 0){
+      $sps2 = "Critical";
+    } else {
+      $sps2 = "Need Attention";
+    }
+  print "Node 2 Storage Pool Status: $sps2\n";  
+  }
+
+  #Storage Capacity
+  my $spfree1 = 100;
+  my $spcap1 = "";
+  if ($sid =~/<span-list -fsv for pnode 1>\n(.*?)<span-list -fsv for pnode 2>\n/s){
+    for ($1 =~ m/.*?SP-\d\d.*?\w+.*?(\d+)%.*?\n/gs){
+      $spfree1 = $_ if $_ < $spfree1;
+    }
+  $spcap1 = 100 - $spfree1 ."%";   
+  print "Node 1 Pool Capacity Closest to 100%: $spcap1\n";  
+  }
+
+  my $spfree2 = 100;
+  my $spcap2 = "";
+  if ($sid =~/<span-list -fsv for pnode 2>\n(.*?)<s/s){
+    for ($1 =~ m/.*?SP-\d\d.*?\w+.*?(\d+)%.*?\n/gs){
+      $spfree2 = $_ if $_ < $spfree2;
+    }
+  $spcap2 = 100 - $spfree2 ."%";   
+  print "Node 2 Pool Capacity Closest to 100%: $spcap2\n";  
+  }
+}
 

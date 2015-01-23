@@ -41297,7 +41297,7 @@ Current queue depths for all open devices:
 
 Device   Target   Current   Actual   Software
 ---------------------------------------------
-    0       32       32        32
+    0       35       32        31
     1       32       32        32
     2       32       32        32
     3       32       32        32
@@ -41308,7 +41308,7 @@ Device   Target   Current   Actual   Software
 ---------------------------------------------
     4       32       32        32
     5       32       32        32
-    6       32       32        32
+    6       32       1         32
     7       32       32        32
 <scsi-io-errors for pnode 1>
 Errors in the last 24h
@@ -41599,7 +41599,7 @@ Serial: 7
 <span-list -fsv for pnode 1>
 Span instance name     OK?  Free  Cap/GiB  Chunks                 Con  Snap  Cod fullness    Cluster  Engrav  Permanent ID      DWB
 ---------------------  ---  ----  -------  ---------------------  ---  ----  --------------  -------  ------  ----------------  ---
-SP-01                  Yes   22%    43418    493 x   94489280512  Con          1%,  6%,  1%  This     Dual    883137B31D045372  Yes
+SP-01                  Yes   12%    43418    493 x   94489280512  Con          1%,  6%,  1%  This     Dual    883137B31D045372  Yes
    Set 0: 4 x 10854GiB = 43418GiB
       SD 0 (rack '66510', SD '7000')
       SD 1 (rack '66510', SD '7001')
@@ -41632,7 +41632,7 @@ SP-02                  Yes   73%    43418    493 x   94489280512  90%          1
 <span-list -fsv for pnode 2>
 Span instance name     OK?  Free  Cap/GiB  Chunks                 Con  Snap  Cod fullness    Cluster  Engrav  Permanent ID      DWB
 ---------------------  ---  ----  -------  ---------------------  ---  ----  --------------  -------  ------  ----------------  ---
-SP-01                  Yes   22%    43418    493 x   94489280512  Con          1%,  6%,  1%  This     Dual    883137B31D045372  Yes
+SP-01                  No    2%     43418    493 x   94489280512  Con          1%,  6%,  1%  This     Dual    883137B31D045372  Yes
    Set 0: 4 x 10854GiB = 43418GiB
       SD 0 (rack '66510', SD '7000')
       SD 1 (rack '66510', SD '7001')
@@ -41648,7 +41648,7 @@ SP-01                  Yes   22%    43418    493 x   94489280512  Con          1
   Filesystem rnd-clufs-10-sp01-fs01:
    fs rnd-cluf..sp01-fs01  Mount, EVS    9, cap  10744, con      0  , perm 88359954119D3193, dev 1033,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: ????
 
-SP-02                  Yes   73%    43418    493 x   94489280512  90%          1%,  6%,  0%  This     Dual    883137BB09724B14  Yes
+SP-02                  No    73%    43418    493 x   94489280512  90%          1%,  6%,  0%  This     Dual    883137BB09724B14  Yes
    Set 0: 4 x 10854GiB = 43418GiB
       SD 4 (rack '66510', SD '7004')
       SD 5 (rack '66510', SD '7005')
