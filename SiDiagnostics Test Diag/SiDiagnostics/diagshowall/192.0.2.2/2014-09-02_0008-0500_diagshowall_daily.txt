@@ -41607,13 +41607,13 @@ SP-01                  Yes   12%    43418    493 x   94489280512  Con          1
       SD 3 (rack '66510', SD '7003')
 
   Filesystem bos-hnas-01-sp01-fs01:
-   fs bos-hnas..sp01-fs01  Mount, EVS    8, cap   5108, con   5120  , perm 881A2894A1DCD45F, dev 1032,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: Full
-   fs charm-01-sp01-fs01   Mount, EVS    1, cap   2025, con   2048  , perm 8831298CCB6FFB2A, dev 1025,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
-   fs photon-02-sp01-fs01  Mount, EVS    2, cap   5196, con   5530  , perm 883129B689A0612F, dev 1026,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs bos-hnas..sp01-fs01  UnMnt, EVS    8, cap   5108, con   5120  , perm 881A2894A1DCD45F, dev 1032,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: Full
+   fs charm-01-sp01-fs01   NoEVS, EVS    1, cap   2025, con   2048  , perm 8831298CCB6FFB2A, dev 1025,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs photon-02-sp01-fs01  UnMnt, EVS    2, cap   5196, con   5530  , perm 883129B689A0612F, dev 1026,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
   Filesystem rnd-clufs-03-sp01-fs01:
-   fs rnd-cluf..sp01-fs01  Mount, EVS    3, cap  10744, con  11172  , perm 883136C8F7D3981A, dev 1024,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: Full
+   fs rnd-cluf..sp01-fs01  UnMnt, EVS    3, cap  10744, con  11172  , perm 883136C8F7D3981A, dev 1024,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: Full
   Filesystem rnd-clufs-10-sp01-fs01:
-   fs rnd-cluf..sp01-fs01  Mount, EVS    9, cap  10744, con      0  , perm 88359954119D3193, dev 1033,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs rnd-cluf..sp01-fs01  UnMnt, EVS    9, cap  10744, con      0  , perm 88359954119D3193, dev 1033,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
 
 SP-02                  Yes   73%    43418    493 x   94489280512  90%          1%,  6%,  0%  This     Dual    883137BB09724B14  Yes
    Set 0: 4 x 10854GiB = 43418GiB
@@ -41622,25 +41622,25 @@ SP-02                  Yes   73%    43418    493 x   94489280512  90%          1
       SD 6 (rack '66510', SD '7006')
       SD 7 (rack '66510', SD '7007')
 
-   fs dagger-05-sp02-fs01  Mount, EVS    5, cap     88, con   5192  , perm 8831285798DD119D, dev 1029,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs dagger-05-sp02-fs01  UnMnt, EVS    5, cap     88, con   5192  , perm 8831285798DD119D, dev 1029,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
   Filesystem hou-hnasprd-01-sp02-fs01:
-   fs hou-hnas..sp02-fs01  Mount, EVS    7, cap   7661, con  10296  , perm 887209BF10268ABD, dev 1031,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
-   fs mohawk-04-sp02-fs01  Mount, EVS    4, cap   3699, con   4608  , perm 883129A9A46AD718, dev 1027,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
-   fs mohawk-04-sp02-fs02  Mount, EVS    4, cap     88, con   1848  , perm 883129AF8AD932D6, dev 1028,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
-   fs smore-06-sp02-fs01   Mount, EVS    6, cap     88, con    264  , perm 88312840A311227D, dev 1030,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs hou-hnas..sp02-fs01  UnMnt, EVS    7, cap   7661, con  10296  , perm 887209BF10268ABD, dev 1031,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs mohawk-04-sp02-fs01  UnMnt, EVS    4, cap   3699, con   4608  , perm 883129A9A46AD718, dev 1027,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs mohawk-04-sp02-fs02  UnMnt, EVS    4, cap     88, con   1848  , perm 883129AF8AD932D6, dev 1028,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
+   fs smore-06-sp02-fs01   UnMnt, EVS    6, cap     88, con    264  , perm 88312840A311227D, dev 1030,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX:   OK
 
 <span-list -fsv for pnode 2>
 Span instance name     OK?  Free  Cap/GiB  Chunks                 Con  Snap  Cod fullness    Cluster  Engrav  Permanent ID      DWB
 ---------------------  ---  ----  -------  ---------------------  ---  ----  --------------  -------  ------  ----------------  ---
-SP-01                  No    2%     43418    493 x   94489280512  Con          1%,  6%,  1%  This     Dual    883137B31D045372  Yes
-   Set 0: 4 x 10854GiB = 43418GiB
+SP-01                  Yes    2%     43418    493 x   94489280512  Con          1%,  6%,  1%  This     Dual    883137B31D045372  Yes
+   Set 0: 1 x 10854GiB = 43418GiB
       SD 0 (rack '66510', SD '7000')
       SD 1 (rack '66510', SD '7001')
       SD 2 (rack '66510', SD '7002')
       SD 3 (rack '66510', SD '7003')
 
   Filesystem bos-hnas-01-sp01-fs01:
-   fs bos-hnas..sp01-fs01  Mount, EVS    8, cap   5108, con   5120  , perm 881A2894A1DCD45F, dev 1032,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: ????
+   fs bos-hnas..sp01-fs01  UnMnt, EVS    8, cap   5108, con   5120  , perm 881A2894A1DCD45F, dev 1032,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: ????
    fs charm-01-sp01-fs01   Mount, EVS    1, cap   2025, con   2048  , perm 8831298CCB6FFB2A, dev 1025,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: ????
    fs photon-02-sp01-fs01  Mount, EVS    2, cap   5196, con   5530  , perm 883129B689A0612F, dev 1026,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: ????
   Filesystem rnd-clufs-03-sp01-fs01:
@@ -41648,7 +41648,7 @@ SP-01                  No    2%     43418    493 x   94489280512  Con          1
   Filesystem rnd-clufs-10-sp01-fs01:
    fs rnd-cluf..sp01-fs01  Mount, EVS    9, cap  10744, con      0  , perm 88359954119D3193, dev 1033,  4KiB, WFS-2, DSBs: 128, DWB: Yes , Thin:  No, AX: ????
 
-SP-02                  No    73%    43418    493 x   94489280512  90%          1%,  6%,  0%  This     Dual    883137BB09724B14  Yes
+SP-02                  Yes    73%    43418    493 x   94489280512  90%          1%,  6%,  0%  This     Dual    883137BB09724B14  Yes
    Set 0: 4 x 10854GiB = 43418GiB
       SD 4 (rack '66510', SD '7004')
       SD 5 (rack '66510', SD '7005')

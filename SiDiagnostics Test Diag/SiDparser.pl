@@ -439,21 +439,6 @@ sub parse_sid{
     print "Node 2 SCSI Queue Depth: $sqdstatus2\n";
   }
   
-
-  #REPLACE WITH VALUE CAPTURING SCRIPT
-  #Span-List -FSV
-  my $spfsv1;
-  my $spfsv2;
-  
-  if ($sid =~/<span-list -fsv for pnode 1>\n(.*?)<span-list -fsv for pnode 2>\n/s){
-    $spfsv1 = $1;
-    print "Node 1 Span-List -FSV:\n$spfsv1\n";
-  }
-  if ($sid =~/<span-list -fsv for pnode 2>\n(.*?)<sd-dump-unloadable/s){
-    $spfsv2 = $1;
-    print "Node 2 Span-List -FSV:\n$spfsv2\n";
-  }
-
   #Storage Back-End Backlog
   my $mqr1 = 0;
   my $mqr2 = 0;
@@ -490,11 +475,7 @@ sub parse_sid{
     print "Node 2 Highest Number of Queued Writes: $mqw2\n";
   }
 
-
-    #REPLACE WITH VALUE CAPTURING SCRIPT
-  #Span-List -FSV
- 
-  
+  #STORAGE POOL STATUS
   #Storage Pool Status
   my $sps1 = "";
   my $sps2 = "";
@@ -550,5 +531,126 @@ sub parse_sid{
   $spcap2 = 100 - $spfree2 ."%";   
   print "Node 2 Pool Capacity Closest to 100%: $spcap2\n";  
   }
+
+  #Stripe Sets
+  my $stripestatus1 = "";
+  my $stripestatus2 = "";
+  my $stripeok1 = 0;
+  my $stripeok2 = 0;
+  my $stripecritical1 = 0;
+  my $stripecritical2 = 0;
+  my $stripena1 = 0;
+  my $stripena2 = 0;
+  if ($sid =~/<span-list -fsv for pnode 1>\n(.*?)<span-list -fsv for pnode 2>\n/s){
+    for ($1 =~ m/Set \d+:.*?(\d+).*?\n/gs){
+      if ($_ >= 4){
+        $stripeok1++;
+      } elsif ($_ == 1){
+        $stripecritical1++;
+      } else {
+        $stripena1++;
+      }
+    }
+  if ($stripecritical1 > 0){
+    $stripestatus1 = "Critical";
+  }  elsif ($stripena1 == 0 && $stripecritical1 == 0){
+    $stripestatus1 = "OK"
+  } else {
+    $stripestatus1 = "Needs Attention";
+  }
+  print "Node 1 Stripe Status: $stripestatus1\n";
+  }
+
+  if ($sid =~/<span-list -fsv for pnode 2>\n(.*?)<s/s){
+    for ($1 =~ m/Set \d+:.*?(\d+).*?\n/gs){
+      if ($_ >= 4){
+        $stripeok2++;
+      } elsif ($_ == 1){
+        $stripecritical2++;
+      } else {
+        $stripena2++;
+      }
+    }
+  if ($stripecritical2 >= 1){
+    $stripestatus2 = "Critical";
+  }  elsif ($stripena2 == 0 && $stripecritical2 == 0){
+    $stripestatus2 = "OK"
+  } else {
+    $stripestatus2 = "Needs Attention";
+  }
+  print "Node 2 Stripe Status: $stripestatus2\n";
+  }
+
+  
+
+  #Meets BP
+  my $meetsbp1 = "";
+  my $meetsbp2 = "";
+  if ($sps1 eq "OK" && $stripestatus1 eq "OK"){
+    $meetsbp1 = "OK";
+  } elsif ($sps1 eq "Critical" || $stripestatus1 eq "Critical"){
+    $meetsbp1 = "Critical";
+  } else {
+    $meetsbp1 = "Needs Attention";
+  }
+
+  print "Node 1 BP: $meetsbp1\n";
+
+
+  if ($sps2 eq "OK" && $stripestatus2 eq "OK"){
+    $meetsbp2 = "OK";
+  } elsif ($sps2 eq "Critical" || $stripestatus2 eq "Critical"){
+    $meetsbp2 = "Critical";
+  } else {
+    $meetsbp2 = "Needs Attention";
+  }
+
+  print "Node 2 BP: $meetsbp2\n";
+
+  #FILE SYSTEM HEALTH CHECK
+
+  #File System Status
+  my $fsstatus1 = "";
+  my $fsstatus2 = "";
+  my $fsok1 = 0;
+  my $fsok2 = 0;
+  my $fscritical1 = 0;
+  my $fscritical2 = 0;
+
+  if ($sid =~ /<span-list -fsv for pnode 1>\n(.*?)<span-list -fsv for pnode 2>\n/s){
+    for ($1 =~m/.*?fs.*? +?(\w+),.*?\n/gs){
+      if ($_ eq "UnMnt" || $_ eq "NoEVS"){
+        $fscritical1++;
+      } else {
+        $fsok1++;
+      }
+    }
+  }
+  if ($fsok1 == 0){
+    $fsstatus1 = "Critical";
+  } elsif ($fscritical1 == 0){
+    $fsstatus1 = "OK";
+  } else {
+    $fsstatus1 = "Needs Attention";
+  }
+  print "Node 1 File System Status: $fsstatus1\n";
+
+  if ($sid =~ /<span-list -fsv for pnode 2>\n(.*?)<s/s){
+    for ($1 =~m/.*?fs.*? +?(\w+),.*?\n/gs){
+      if ($_ eq "UnMnt" || $_ eq "NoEVS"){
+        $fscritical2++;
+      } else {
+        $fsok2++;
+      }
+    }
+  }
+  if ($fsok2 == 0){
+    $fsstatus2 = "Critical";
+  } elsif ($fscritical2 == 0){
+    $fsstatus2 = "OK";
+  } else {
+    $fsstatus2 = "Needs Attention";
+  }
+  print "Node 2 File System Status: $fsstatus2\n";
 }
 
