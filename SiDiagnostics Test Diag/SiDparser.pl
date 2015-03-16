@@ -15,9 +15,9 @@ sub parse_sid{
   my $sid_fh;
 
   # IMPORTANT: Don't forget to delete and uncomment below for user inputted evs
-  my $evsip = "192.0.2.2";
-  #print "Admin EVS IP: ";
-  #chomp(my $evsip = <STDIN>);
+  #my $evsip = "192.0.2.2";
+  print "Please input the admin EVS IP of the desired node: ";
+  chomp(my $evsip = <STDIN>);
   my $sid_path = "SiDiagnostics/diagshowall/$evsip";
   opendir my $SiDdiag, "$sid_path" or die "Could not open the SiDiagnostic: $!";
   foreach my $file (readdir $SiDdiag){ 
@@ -652,5 +652,132 @@ sub parse_sid{
     $fsstatus2 = "Needs Attention";
   }
   print "Node 2 File System Status: $fsstatus2\n";
+
+  #Stripe Size Check
+  #User Will Perform the Stripe Size Check
+  print "\nCheck to see if any NLSAS SDs are using 4k Stripe Sizes. If so, input Needs Attention. Otherwise, input OK. Caps matter.\n\n";
+  if ($sid =~ /<span-list -fsv for pnode 1>\n(.*?)<span-list -fsv for pnode 2>\n/s){
+    print "$1\n";
+  }
+  print "\nPlease decide whether the stripe sets are 'OK' or 'Needs Attention'\n";
+  my $spanestripestatus = <STDIN>;
+
+  #Check File System Capacity
+  my $fsusedcap = 0;
+  if ($sid =~ /<df for vnode 1>(.*?)<for-each-fs/s){
+    for ($1 =~ /.*?B .*?B .(\d+).*?\n/gs){
+      if ($_ > $fsusedcap){
+        $fsusedcap = $_;
+      }
+    }
+  }
+
+  #FS Meets BP
+  my $fsmeetsbp;
+  if ($fsstatus1 eq "OK" && $fsstatus2 eq "OK" && $fsusedcap < 90){
+    $fsmeetsbp = "OK";
+  } elsif ($fsstatus1 eq "Critical" || $fsstatus2 eq "Critical" || $fsusedcap > 95){
+    $fsmeetsbp = "Critical";
+  } else {
+    $fsmeetsbp = "Needs Attention";
+  }
+  print "FS BP Status: $fsmeetsbp\n";
+
+  #STORAGE BACK-END BACKLOG MAX QR/QW
+  my $backendqr1 = 0;
+  my $backendqw1 = 0;
+  my $backendqr2 = 0;
+  my $backendqw2 = 0;
+  #Node 1 QR/QW
+
+  #QR1
+  if ($sid =~ /<devinfo -a for pnode 1>(.*?)<devinfo -a for pnode 2/s){
+    for($1 =~ /.*?\d+ \w.*?\d+.*?\d.*?\d+.*?\d+.*?\d+.*?(\d+).*?\d+.*?\d+.*?\d+.*?\d+.*?\d+.*?\n/gs){
+      if ($backendqr1 < $_){
+        $backendqr1 = $_;
+      }
+    }
+    print "Node 1 highest number of back end backlog queued reads: $backendqr1\n";
+  }
+  #QW1
+  if ($sid =~ /<devinfo -a for pnode 1>(.*?)<devinfo -a for pnode 2/s){
+    for($1 =~ /.*?\d+ \w.*?\d+.*?\d.*?\d+.*?\d+.*?\d+.*?\d+.*?\d+.*?(\d+).*?\d+.*?\d+.*?\d+.*?\n/gs){
+      if ($backendqw1 < $_){
+        $backendqw1 = $_;
+      }
+    }
+    print "Node 1 highest number of back end backlog queued writes: $backendqw1\n";
+  }
+  
+  #Node 2 QR/QW
+
+  #QR2
+  if ($sid =~ /<devinfo -a for pnode 2>(.*?)<scsi-/s){
+    for($1 =~ /.*?\d+ \w.*?\d+.*?\d.*?\d+.*?\d+.*?\d+.*?(\d+).*?\d+.*?\d+.*?\d+.*?\d+.*?\d+.*?\n/gs){
+      if ($backendqr2 < $_){
+        $backendqr2 = $_;
+      }
+    }
+    print "Node 2 highest number of back end backlog queued reads: $backendqr2\n";
+  }
+  #QW
+  if ($sid =~ /<devinfo -a for pnode 2>(.*?)<scsi/s){
+    for($1 =~ /.*?\d+ \w.*?\d+.*?\d.*?\d+.*?\d+.*?\d+.*?\d+.*?\d+.*?(\d+).*?\d+.*?\d+.*?\d+.*?\n/gs){
+      if ($backendqw2 < $_){
+        $backendqw2 = $_;
+      }
+    }
+    print "Node 2 highest number of back end backlog queued writes: $backendqw2\n";
+  }
+
+  #SAN OR DAS
+  my $portcon1;
+  my $portcon2;
+  if ($sid =~ /<fc-ports -v for pnode 1>(.*?)<fc-ports -v for pnode 2>/s){
+    if ($1 =~ /Comment : Fabric/){
+      $portcon1 = "SAN";
+    } else {
+      $portcon1 = "DAS";
+    }
+    print "Node 1 fc-ports -v indicates connection by: $portcon1\n";
+  }
+  if ($sid =~ /<fc-ports -v for pnode 2>(.*?)<scsi/s){
+    if ($1 =~ /Comment : Fabric/){
+      $portcon2 = "SAN";
+    } else {
+      $portcon2 = "DAS";
+    }
+    print "Node 2 fc-ports -v indicates connection by: $portcon2\n";
+  }
+
+  #CABLING
+  print $1 if ($sid =~ /<scsi-racks for pnode 1>(.*?)<scsi-preferred/s);
+  print "Please determine whether the cabling Needs Attention or is OK\n";
+  my $cablinghealth = <STDIN>;
+
+  #PREFERRED PATHS
+  my $pathconnection;
+  for ($sid =~ /<scsi-devices -vo for pnode 1>(.*?)<scsi-ports/s){
+    if ($1 =~ /Device opened using this nexus.*?Preferred path: no /gs){
+      $pathconnection = "Needs Attention"
+    } else {
+    $pathconnection = "OK";
+    }
+  }
+  print "Path Connection: $pathconnection\n";
+
+  #SDPATH PREFERRED PATH ASSIGNMENT
+  my $sdpathpreferred;
+  for ($sid =~/<sdpath for pnode 1>(.*?)<sidiag/s){
+    if ($1 =~ /\*>/gs){
+      $sdpathpreferred = "Needs Attention";
+    } else {
+      $sdpathpreferred = "OK";
+    }
+  }
+  print "SD Path: $sdpathpreferred\n";
+
+
+
 }
 
